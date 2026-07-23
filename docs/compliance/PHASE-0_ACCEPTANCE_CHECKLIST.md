@@ -1,201 +1,198 @@
 ---
 type: phase-0-acceptance
 product: CBA-Enterprise
-status: LOCKED_DRAFT v2 — Commander research (part 1 + continuation)
+status: LOCKED_DRAFT v3 — full research corpus absorbed
 date: 2026-07-23
 agent: engineer-grok
-revision: 2
-source: Commander Phase-0 checklist (NotebookLM / regulatory corpus)
+revision: 3
+source: Commander Phase-0 checklist parts 1–3 (NotebookLM token-split Qs)
+note: NotebookLM input token limits may require splitting research queries; reassemble here as single law.
 ---
 
 # PHASE-0 ACCEPTANCE CHECKLIST  
-## Core Compliance & Architecture Gates (v2)
+## Core Compliance & Architecture Gates (v3 — complete)
 
-**Law:** No feature phase (M1–M5) may **process bank or consumer regulated data** in a shared/prod-like environment until every control marked **MUST PASS BEFORE START = YES** is green with evidence.
+**Law:** No feature phase (M1–M5) may **process bank or consumer regulated data** in a shared/prod-like environment until every control marked **MUST PASS BEFORE START = YES** is green with evidence (or signed **N/A** where allowed).
 
 **Build order:** Phase 0 → **M1 Ingest + M3 Report** → M2 Track → M4 Verify → M5 Gate.  
 **Stress fail = freeze next phase.**
 
 **Related:**  
-- `docs/regulatory/OCC-2013-29-vendor-management.md`  
-- `docs/architecture/system-architecture.md`  
 - `docs/architecture/data-model.md`  
-- `docs/compliance/artifacts/` (evidence stubs)
-
-**Revision note (v2):** Continuation absorbed — vendor risk elevated to **YES** for any external API/cloud/model path; IAM + audit restated; **G7 Model Risk / AI Fairness** and **G8 HMDA/CRA/1071 alignment** added. Prior “G5 parallel for all internal build” is **narrowed**: docs/scaffold OK; **no external integration** without G4 green.
-
----
-
-## Gate summary
-
-| # | Control | Must pass before start? | Evidence artifact | Blocks |
-|---|---------|-------------------------|-------------------|--------|
-| **G1** | Data lineage & source mapping | **YES** | Data Lineage Document / Mapping Matrix | Any **Ingest** of real/bank feeds |
-| **G2** | Front-end validation & quality sentinel | **YES** | Validation Rules Config Record & Test Log | **Track** + **Report** on live data |
-| **G3** | Change management & secure SDLC | **YES** | CI/CD Deployment Audit Trail | Deploys to envs holding financial/consumer data |
-| **G4** | Third-party vendor risk & due diligence | **YES** *for external APIs, cloud, external models* | Vendor Risk Assessment & Executed Contracts | Integrations, subprocessors, hosted prod with third parties |
-| **G5** | IAM, MFA & cybersecurity | **YES** | IAM Configuration & Access Control Policy | Any deploy holding regulated data |
-| **G6** | Audit logging & real-time monitoring | **YES** | SIEM Configuration & Audit Log Export | Features processing financial data |
-| **G7** | Model risk, procedural fairness & AI comprehension | **YES** *if AI/ML used* | Model Validation Report & AI Comprehension Gate | Credit/eligibility AI, generative UX, ML compliance monitoring |
-| **G8** | Regulatory reporting alignment (HMDA/CRA/1071) | **YES** *if fields feed regulatory-style submit/export* | Regulatory Edit Check Config & Mock Submission File | Track/extract for regulatory or regulator-adjacent schemas |
-
-**Docs-only / synthetic local scaffold:** allowed without full green **if** no external network vendors and no real bank/consumer PII.  
-**First cloud host, bank API, or paid model API:** G4 + G5 + G6 required green.
+- `docs/architecture/system-architecture.md`  
+- `docs/regulatory/OCC-2013-29-vendor-management.md`  
+- `docs/compliance/DATA_PLANE_SPEC.md` (backside contracts — this revision)  
+- `docs/compliance/artifacts/`
 
 ---
 
-## G1 — Data Lineage and Source Mapping Control
+## Gate summary (G1–G10)
+
+| # | Control | Must pass before start? | Evidence artifact |
+|---|---------|-------------------------|-------------------|
+| **G1** | Data lineage & source mapping | **YES** | Data Lineage Document / Mapping Matrix |
+| **G2** | Front-end validation & quality sentinel | **YES** | Validation Rules Config Record & Test Log |
+| **G3** | Change management & secure SDLC | **YES** | CI/CD Deployment Audit Trail |
+| **G4** | Third-party vendor risk & due diligence | **YES** for external API/cloud/models | Vendor Risk Assessment & Executed Contracts |
+| **G5** | IAM, MFA & cybersecurity | **YES** | IAM Configuration & Access Control Policy |
+| **G6** | Audit logging & real-time monitoring | **YES** | SIEM Configuration & Audit Log Export |
+| **G7** | Model risk, procedural fairness & AI comprehension | **YES if AI/ML** | Model Validation Report & AI Comprehension Gate |
+| **G8** | Regulatory reporting alignment (HMDA/CRA/1071) | **YES** if regulator-grade fields/export | Regulatory Edit Check Config & Mock Submission File |
+| **G9** | Manual review (human-in-the-loop) flagging | **YES** | Exception & Quality Edit Workflow Rules |
+| **G10** | Public LLM & uncontrolled third-party boundary | **YES** | Data Classification & AI Guardrails Matrix |
+
+**Docs-only / synthetic offline (no real PII, no external vendors):** design allowed.  
+**First cloud host, bank feed, or paid model:** G4 + G5 + G6 + G10 green minimum.
+
+---
+
+## G1 — Data Lineage and Source Mapping
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** — no ingestion until origin and transformation rules are mapped |
-| **Evidence artifact** | `Data Lineage Document / Mapping Matrix` |
-| **What “good” looks like** | Every reported data element traces to exact source system and collection point; all field transformations between source and regulatory reporting formats documented |
-| **Examiner-facing language** | *“The Monitor will assess the Bank’s data governance framework for accuracy, completeness, consistency, effectiveness, and timeliness of TD Bank’s AML data processing… including the identification and flow of relevant data sources and associated systems.”* |
-| **CBA-Enterprise mapping** | Commitment/Disbursement/ReportLine lineage; versioned bank-code → taxonomy map; `AuditEvent` on remap |
-| **Stress** | Unknown source field rejected; silent drop of required lineage field = FAIL |
-
-**Artifact path:** `docs/compliance/artifacts/DATA_LINEAGE_MAPPING_MATRIX.md`
+| **Must pass?** | **YES** — no ingest until origin + transforms mapped |
+| **Evidence** | `Data Lineage Document / Mapping Matrix` |
+| **Good** | Every reported element → source system + collection point; transforms to regulatory formats documented |
+| **Examiner language** | *Monitor assesses data governance for accuracy, completeness, consistency, effectiveness, timeliness… identification and flow of relevant data sources and associated systems.* |
+| **Stress** | Unknown source field rejected; silent drop of lineage-required field = FAIL |
 
 ---
 
-## G2 — Front-End Validation & Quality Sentinel Control
+## G2 — Front-End Validation & Quality Sentinel
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** — no tracking/reporting without automated GIGO gates |
-| **Evidence artifact** | `Validation Rules Configuration Record & Test Log` |
-| **What “good” looks like** | Multi-layer validation: format, range, logical relationships, regulatory business rules (HMDA/ECOA-adjacent where applicable). Incomplete/inconsistent rows flagged **before** workflow progress |
-| **Examiner-facing language** | *“Data testing and validation are ongoing processes. Before LAR submission, compliance teams should perform audits, or sample tests, on the data… Systemic data integrity reviews of your CRA and HMDA LARs can also be very helpful in identifying data trends and outlier values…”* |
-| **CBA-Enterprise mapping** | Track quarantine; Report cannot **file** with open critical validation fails; category ∈ taxonomy |
-| **Stress** | Bad geo/ZIP rules, negative $, unmapped category, duplicate idempotency key |
-
-**Artifact path:** `docs/compliance/artifacts/VALIDATION_RULES_AND_TEST_LOG.md`
+| **Must pass?** | **YES** — no track/report without GIGO gates |
+| **Evidence** | `Validation Rules Configuration Record & Test Log` |
+| **Good** | Format, range, logical, regulatory rules; incomplete/inconsistent flagged **before** progress |
+| **Examiner language** | *Data testing/validation ongoing; sample tests before LAR submission; integrity reviews for trends/outliers before filing.* |
+| **Stress** | Bad format, null without NA code, unmapped category |
 
 ---
 
-## G3 — Change Management & Secure Development Lifecycle (SDLC)
+## G3 — Change Management & Secure SDLC
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** — no financial/consumer-data env deploys without auditable review |
-| **Evidence artifact** | `CI/CD Deployment Audit Trail` |
-| **What “good” looks like** | Formal change request/approval; **≥ two-person** production approval; segregation of duties (author ≠ sole prod approver); automated test gates in CI/CD |
-| **Examiner-facing language** | *“An audit is an independent assessment and validation of an institution’s system of internal controls…”* *“Assess the third party’s change management processes to ensure… segregation of duties are in place.”* |
-| **CBA-Enterprise mapping** | Protected main; PR required; `.github/workflows` gates; no solo force-push to bank-facing env |
-| **Stress** | Deploy without PR = blocked; red tests = blocked |
-
-**Artifact path:** `docs/compliance/artifacts/CICD_DEPLOYMENT_AUDIT_TRAIL.md`
+| **Must pass?** | **YES** |
+| **Evidence** | `CI/CD Deployment Audit Trail` |
+| **Good** | Change request; **≥2-person** prod approval; SoD; automated CI gates |
+| **Examiner language** | *Audit = independent assessment of internal controls… Assess third-party change management for roles, responsibilities, segregation of duties.* |
 
 ---
 
-## G4 — Third-Party Vendor Risk & Due Diligence Control  
-*(Continuation §4 — elevated)*
+## G4 — Third-Party Vendor Risk & Due Diligence
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** for any feature integrating **external APIs, cloud services, or external models** |
-| **Evidence artifact** | `Vendor Risk Assessment & Executed Contracts` |
-| **What “good” looks like** | Standardized vendor assessment **before** onboarding: security posture, financial condition, compliance status. Contracts include **right-to-audit**, strict data handling, **data return/destruction on termination**, incident notification (target ≤ 72h), remediation rights |
-| **Examiner-facing language** | *“A bank should conduct due diligence on all potential third parties before selecting and entering into contracts or relationships.”* *“Ensure that the contract establishes the bank’s right to audit, monitor performance, and require remediation when issues are identified.”* |
-| **CBA-Enterprise mapping** | Hostinger / Render / IONOS / any LLM API / city data vendors = register entries; fourth-party list in OCC posture doc |
-| **Parallel allowed** | Pure local docs + synthetic offline design **without** external network vendors |
-| **Stress** | Undeclared subprocessor in data path = FAIL |
-
-**Artifact path:** `docs/compliance/artifacts/VENDOR_RISK_REGISTER.md`
+| **Must pass?** | **YES** for external APIs, cloud, external models |
+| **Evidence** | `Vendor Risk Assessment & Executed Contracts` |
+| **Good** | Assessment before onboard; right-to-audit; data handling; return/destruction on termination; incident notify (target ≤72h) |
+| **Examiner language** | *Due diligence on all potential third parties before contracts… Contract establishes right to audit, monitor, require remediation.* |
 
 ---
 
-## G5 — Identity, Access Management (IAM) & Cybersecurity Control  
-*(Continuation §5)*
+## G5 — IAM, MFA & Cybersecurity
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** — no deploy without zero-trust boundaries and access governance |
-| **Evidence artifact** | `IAM Configuration & Access Control Policy` |
-| **What “good” looks like** | MFA on all systems, cloud consoles, and internal dashboards; RBAC + least privilege; **quarterly** access reviews; **no standing admin** — JIT for privileged ops |
-| **Examiner-facing language** | *“Ensure MFA is enabled for all systems and user access is reviewed regularly.”* *“Evaluate whether the third party has sufficient physical and environmental controls to ensure the safety and security of its facilities, technology systems, and employees.”* |
-| **CBA-Enterprise mapping** | Roles: `bank_admin`, `bank_analyst`, `auditor_ro`, `vendor_operator`; tenant isolation; MFA before prod secrets |
-| **Stress** | Cross-tenant access → deny; access without MFA → deny |
-
-**Artifact path:** `docs/compliance/artifacts/IAM_ACCESS_CONTROL_POLICY.md`
+| **Must pass?** | **YES** |
+| **Evidence** | `IAM Configuration & Access Control Policy` |
+| **Good** | MFA everywhere; RBAC; quarterly access review; no standing admin — JIT for privilege |
+| **Examiner language** | *MFA enabled; access reviewed regularly… Sufficient physical/environmental controls for facilities and systems.* |
 
 ---
 
-## G6 — Audit Logging & Real-Time Monitoring Control  
-*(Continuation §6)*
+## G6 — Audit Logging & Real-Time Monitoring
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** — no financial data processing without immutable searchable trail |
-| **Evidence artifact** | `SIEM Configuration & Audit Log Export` |
-| **What “good” looks like** | Continuous logging/alerting across endpoints, servers, cloud apps; captures authentication, data transformations, system exceptions; **retain ≥ 12 months** for post-incident and exams |
-| **Examiner-facing language** | *“Implement logging and alerting across endpoints, servers, and cloud apps.”* *“Ensure that the contract requires the third party to provide and retain timely, accurate, and comprehensive information such as records and reports that allow bank management to monitor performance, service levels, and risks.”* |
-| **CBA-Enterprise mapping** | Append-only `AuditEvent`; filed report hashes; export path for bank/auditor |
-| **Stress** | Missing auth log on privileged action = FAIL; log tamper detectable |
-
-**Artifact path:** `docs/compliance/artifacts/SIEM_AND_AUDIT_LOG_EXPORT.md`
+| **Must pass?** | **YES** |
+| **Evidence** | `SIEM Configuration & Audit Log Export` |
+| **Good** | Continuous logging/alerting; auth + transforms + exceptions; **retain ≥12 months** |
+| **Examiner language** | *Logging/alerting across endpoints, servers, cloud… Third party retains timely accurate comprehensive records for bank monitoring.* |
 
 ---
 
-## G7 — Model Risk, Procedural Fairness & AI Comprehension Control  
-*(Continuation §7 — NEW)*
+## G7 — Model Risk, Procedural Fairness & AI Comprehension
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES if** AI/ML is used for credit/eligibility decisions, generative UX, or compliance monitoring |
-| **Evidence artifact** | `Model Validation Report & AI Comprehension Gate` |
-| **What “good” looks like** | Models tested for **procedural fairness** (no different reasoning pathways by demographic group). Comprehension gate: structural + semantic context checks before deploy; **no black-box logic** to production without human-reviewable rationale |
-| **Examiner-facing language** | *“Under ECOA and Regulation B, lenders are prohibited from applying different underwriting standards to different demographic groups… At the model development stage, CEC [Counterfactual Explanation Consistency] regularization can be incorporated into training pipelines to prevent procedural bias from arising in the first place.”* |
-| **CBA-Enterprise mapping** | **Default v1:** no AI in bank exam path or Gate underwriting. If Verify anomaly ML or any scoring is added → full G7 package. Local-compute law: no bank PII to public LLMs. Black-box theorem applies |
-| **If no AI in phase** | Mark **N/A — no AI** with signed statement; re-open G7 before first model ships |
-| **Stress** | Protected-class path divergence; unexplained score; undeclared model version |
-
-**Artifact path:** `docs/compliance/artifacts/MODEL_VALIDATION_AND_AI_COMPREHENSION_GATE.md`
+| **Must pass?** | **YES if** AI/ML for credit/eligibility, generative UX, or compliance monitoring |
+| **Evidence** | `Model Validation Report & AI Comprehension Gate` |
+| **Good** | Procedural fairness tests; comprehension gate; no black-box to prod |
+| **Examiner language** | *ECOA/Reg B — no different underwriting standards by demographic group… CEC regularization at model development…* |
+| **Default v1** | **No AI on bank exam path** → signed **N/A — no AI** until model proposed |
 
 ---
 
-## G8 — Regulatory Reporting & Compliance Alignment Control (HMDA / CRA / 1071)  
-*(Continuation §8 — NEW)*
+## G8 — Regulatory Reporting Alignment (HMDA / CRA / 1071)
 
 | | |
 |--|--|
-| **Must pass before start?** | **YES** for features that track or extract data for regulatory submission or regulator-grade export |
-| **Evidence artifact** | `Regulatory Edit Check Configuration & Mock Submission File` |
-| **What “good” looks like** | Fields map to current FFIEC/CFPB specs as applicable (e.g. HMDA FIG editions, Section **1071** small business lending standards, CRA-relevant aggregates). Automated **syntactical, validity, and quality edits** run **before** data progresses; reduces rejection risk |
-| **Examiner-facing language** | *“Data validations are a series of checks that run on a small business lending application register to ensure that the data entries are correct and ready to submit, meaning the data are both internally consistent and consistent with the syntax and logic specified…”* *“Quality: Edits that check whether entries in the individual data fields or combinations of data fields conform to expected values.”* |
-| **CBA-Enterprise mapping** | Product is **CBA/consent-order reporting**, not a full HMDA LAR filer — but **taxonomy, geo, and edit-check discipline** must be examiner-grade. Where we claim alignment, pin **spec version + year** (e.g. 2026 FIG). Mock export in `data/samples/` must pass internal edit suite |
-| **Stress** | Schema drift vs pinned FIG; quality edit failures auto-block file |
+| **Must pass?** | **YES** if track/extract for regulatory or regulator-grade export |
+| **Evidence** | `Regulatory Edit Check Configuration & Mock Submission File` |
+| **Good** | Fields map to current FFIEC/CFPB specs (pin year/edition); syntactical + validity + quality edits **before** progress |
+| **Examiner language** | *Validations ensure entries correct and ready to submit… Quality edits check expected values in fields/combinations.* |
+| **CBA note** | Product is CBA/consent-order reporter, not full HMDA LAR filer — **edit-check discipline still required** where we claim alignment |
 
-**Artifact path:** `docs/compliance/artifacts/REGULATORY_EDIT_CHECKS_AND_MOCK_SUBMISSION.md`
+---
+
+## G9 — Manual Review (Human-in-the-Loop) Flagging Control  
+*(Part 3 — NEW)*
+
+| | |
+|--|--|
+| **Must pass before start?** | **YES** — no unreviewed high-stakes exception or silent discard of anomalous data |
+| **Evidence artifact** | `Exception & Quality Edit Workflow Rules` |
+| **What “good” looks like** | Reasonableness / quality-edit / policy-exception triggers **pause** and **flag**. Human must document justification or correction; system logs **reviewer_id**, **timestamp**, **rationale** before record proceeds |
+| **Examiner-facing language** | *“The loan/application register cannot be submitted until the filer either confirms the accuracy of all values flagged by quality edits… or corrects the flagged values.”* *“Records detailing policy exceptions or overrides, exception reporting and monitoring processes.”* |
+| **CBA-Enterprise mapping** | `man_review_status` lock; Verify `needs_human_review`; Report **file** blocked while open quality flags; M4 anomalies never auto-prove |
+| **Stress** | Auto-clear flag without reviewer = FAIL; proceed-to-file with open exception = FAIL |
+
+**Artifact path:** `docs/compliance/artifacts/EXCEPTION_AND_QUALITY_EDIT_WORKFLOW.md`
+
+---
+
+## G10 — Public LLM & Uncontrolled Third-Party Boundary Control  
+*(Part 3 — NEW)*
+
+| | |
+|--|--|
+| **Must pass before start?** | **YES** |
+| **Evidence artifact** | `Data Classification & AI Guardrails Matrix` |
+| **What “good” looks like** | Technical blockers (redaction/hash gateways) before data leaves controlled env. **NEVER** enter public LLM or uncontrolled third party: (1) PII — SSN, exact KYC/AML, account numbers, biometrics; (2) private non-public federal info / unredacted consumer credit files; (3) proprietary source / infra configs; (4) internal risk assessments, compliance vulnerability reports, **SAR** data |
+| **Examiner-facing language** | *“Prohibit the third party and its subcontractors from using or disclosing the bank’s information, except as necessary to provide the contracted activities or comply with legal requirements.”* *“The AI assistant accesses strictly controlled information; this use case is within the scope of FedRAMP.”* (pattern: controlled scope, not casual public AI) |
+| **CBA-Enterprise mapping** | Token/local-compute law; G4 subprocessors; synthetic-only for demos; Ollama/local for redacted text only |
+| **Stress** | Attempted export of restricted class to public model endpoint = BLOCK + LOG |
+
+**Artifact path:** `docs/compliance/artifacts/DATA_CLASSIFICATION_AND_AI_GUARDRAILS_MATRIX.md`
 
 ---
 
 ## Phase freeze rules
 
 ```
-SYNTHETIC / DOCS ONLY (no real PII, no external vendors):
-  → Design allowed; mark gates OPEN with plan dates
-
-REGULATED DATA OR EXTERNAL API/CLOUD/MODEL:
-  → G1, G2, G3, G4, G5, G6 GREEN required
-  → G7 GREEN or signed N/A-no-AI
-  → G8 GREEN if regulatory-style fields/export in scope
-
-THEN Phase 1 (M1 + M3) may open on non-prod synthetic → stress → next
+IF regulated data OR external vendor path:
+  REQUIRE G1–G6, G9, G10 GREEN
+  REQUIRE G7 GREEN or signed N/A-no-AI
+  REQUIRE G8 GREEN if regulator-grade fields/export in scope
+THEN open Phase 1 (M1+M3) on non-prod → stress → next phase
+ELSE (docs + synthetic offline only):
+  Design allowed; scoreboard may remain OPEN with plan dates
 ```
 
-| Phase | Modules | Extra emphasis |
-|-------|---------|----------------|
-| 0 | Controls | Full scoreboard |
-| 1 | M1 + M3 | G1, G2, G6, G8 (report schema) |
-| 2 | M2 | G2 idempotency + G1 event lineage |
-| 3 | M4 | G7 if ML; G4 for city data vendors |
-| 4 | M5 | G5/G6 elevated PII; G7 if any scoring AI |
+| Phase | Modules | Extra gates |
+|-------|---------|-------------|
+| 0 | Controls | Full G1–G10 |
+| 1 | M1 + M3 | G1, G2, G8, G9 (file lock), G10 |
+| 2 | M2 | G2 + G9 on quality edits |
+| 3 | M4 | G7 if ML; G9 human review queue |
+| 4 | M5 | G5/G6/G10 elevated PII |
 
 ---
 
-## Scoreboard (fill as evidence lands)
+## Scoreboard
 
 | Gate | Status | Evidence path | Owner | Date |
 |------|--------|---------------|-------|------|
@@ -205,22 +202,15 @@ THEN Phase 1 (M1 + M3) may open on non-prod synthetic → stress → next
 | G4 Vendor DD | ⬜ OPEN | | | |
 | G5 IAM/MFA | ⬜ OPEN | | | |
 | G6 Audit/SIEM | ⬜ OPEN | | | |
-| G7 Model/AI fairness | ⬜ OPEN or N/A | | | |
-| G8 HMDA/CRA/1071 edits | ⬜ OPEN | | | |
+| G7 Model/AI | ⬜ OPEN / N/A | | | |
+| G8 HMDA/CRA/1071 | ⬜ OPEN | | | |
+| G9 Human-in-loop | ⬜ OPEN | | | |
+| G10 LLM boundary | ⬜ OPEN | | | |
 
-**Phase-0 overall:** 🔴 **NOT GREEN**
+**Phase-0 overall:** 🔴 **NOT GREEN** (law complete; evidence not filled)
 
 ---
 
-## Numbering crosswalk (v1 → v2)
+## Research ops note (NotebookLM)
 
-| v1 | v2 |
-|----|-----|
-| G1 Lineage | G1 |
-| G2 Validation | G2 |
-| G3 SDLC | G3 |
-| G5 Vendor (was soft NO) | **G4 Vendor YES for external** |
-| G4 IAM | **G5 IAM** |
-| G7 Audit | **G6 Audit** |
-| G6 Comprehension | Folded into **G7** (AI) + PRD still required for launch |
-| — | **G8 Regulatory schemas** NEW |
+Input token limits apply. Split long research questions (as Commander did). **Always reassemble answers into this checklist + `DATA_PLANE_SPEC.md`** so construction has one freeze law, not three chat fragments.
