@@ -205,9 +205,9 @@ ELSE (docs + synthetic offline only):
 | G7 Model/AI | ⬜ OPEN / N/A | | | |
 | G8 HMDA/CRA/1071 | ⬜ OPEN | | | |
 | G9 Human-in-loop | ⬜ OPEN | | | |
-| G10 LLM boundary | ⬜ OPEN | | | |
+| G10 LLM boundary | 🟡 POLICY DRAFT | `artifacts/DATA_CLASSIFICATION_AND_AI_GUARDRAILS_MATRIX.md` | | 2026-07-23 |
 
-**Phase-0 overall:** 🔴 **NOT GREEN** (law complete; evidence not filled)
+**Phase-0 overall:** 🔴 **NOT GREEN** (law complete; evidence partial — G10 policy only; technical blockers open)
 
 ---
 
