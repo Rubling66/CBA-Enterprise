@@ -2,10 +2,10 @@
 type: phase-0-evidence
 gate: G10
 product: CBA-Enterprise
-status: DRAFT — Commander research absorbed; technical blockers still OPEN
+status: DRAFT — NEVER list + bank redaction playbook absorbed; technical blockers still OPEN
 date: 2026-07-23
 agent: engineer-grok
-source: Regulatory TPRM + AI security incident patterns (Commander research)
+source: Regulatory TPRM + bank PII/LLM boundary patterns + AI security incidents (Commander research)
 ---
 
 # G10 — Data Classification & AI Guardrails Matrix
@@ -118,22 +118,88 @@ Public AI chatbots/search: **only** information that is **already public** or **
 
 ---
 
-## 4. Technical blockers (required for G10 GREEN)
+## 4. How banks keep PII out of LLMs (implementation playbook)
 
-| Control | Intent | Status |
-|---------|--------|--------|
-| PII redaction / tokenization gateway before any egress | Model never sees real IDs | ⬜ OPEN |
-| Secret scanning in CI (block key patterns) | Stop commit/leak of secrets | ⬜ OPEN |
-| `.gitignore` + pre-commit for `.env` | No env in git | ⬜ OPEN (repo hygiene) |
-| Documented local-only AI path (Ollama) for CBA work | Data never leaves machine | ⬜ OPEN (policy written; prove in runbook) |
-| Subprocessor list excludes “public LLM training” | G4 contracts | ⬜ OPEN |
-| Agent instructions: refuse paste of SAR/PII/secrets | Human+agent discipline | ✅ This matrix |
+Multi-layered technical boundaries — **not** “trust the user to be careful.” CBA-Enterprise adopts the same stack for any future model path (and for agent sessions today).
+
+### 4.1 Tokenization and data masking (application level)
+
+| Technique | Behavior |
+|-----------|----------|
+| **Mask** | Show only last 3–4 digits (or partial EIN); AI never sees full SSN/PAN/EIN |
+| **Tokenize** | Replace identifier with irreversible or vault-backed token; model runs logic on token only |
+| **Scope** | Applied **at application layer** before any prompt/context assembly |
+
+**Rule:** If the model needs “customer context,” it gets **masked/tokenized** fields only — never raw identifiers.
+
+### 4.2 Redaction gateways and hashing (edge / agent framework)
+
+| Control | Behavior |
+|---------|----------|
+| **Gateway between internal system and LLM** | All egress prompts pass a redaction layer |
+| **Hash user IDs** | Session context carries hashes, not clear IDs |
+| **Strip** | Phone, email, free-text PII patterns removed before model receive |
+
+**Architecture pin:** No direct app → public LLM wire. Always: `App → Redaction Gateway → (local or approved) model`.
+
+### 4.3 Automated secret scanners
+
+| Surface scanned | Action |
+|-----------------|--------|
+| Tool outputs, terminal logs, agent context | Detect API keys, tokens, passwords |
+| Redaction pass | Replace with placeholders **before** conversation context |
+
+Blocks accidental leak of credentials and internal infra strings (pairs with G10 NEVER secrets list and known cloud-agent `.env` incident patterns).
+
+### 4.4 Sanitization and synthetic data (training / fine-tune)
+
+| Environment | Rule |
+|-------------|------|
+| Sandbox model training | Training set **sanitized**; privacy review before use |
+| Prefer **fake / synthetic** data | Learn patterns without real customer records |
+| Production bank data | **Not** used to train public or uncontrolled models |
+
+Aligns with `data/samples/` synthetic-only demos for CBA-Enterprise.
+
+### 4.5 Application-level and observability redaction
+
+| Tool class | Rule |
+|------------|------|
+| Session replay / APM / error trackers | Configure **auto-hide** SSN, account, password fields |
+| Logs and diagnostics | Developers and tools must not retain raw PII in cleartext |
+
+Even third-party **build/monitor** software is in scope — observability is a fourth-party risk (G4).
+
+### 4.6 Sanitized regulatory identifiers (e.g. Section 1071)
+
+| Requirement | Behavior |
+|-------------|----------|
+| External regulatory / reporting UIDs | Generated so they **exclude** underlying data that could **directly identify** applicant or borrower |
+| Transmission | No embedded name, SSN, account, or address in the UID string |
+
+Cross-link: `DATA_PLANE_SPEC.md` (`uid` begins with LEI, no consumer PII).
+
+---
+
+## 5. Technical blockers (required for G10 GREEN)
+
+| Control | Maps to §4 | Status |
+|---------|------------|--------|
+| PII redaction / tokenization gateway before any egress | 4.1, 4.2 | ⬜ OPEN |
+| Secret scanning on tool/log/context before agent/LLM | 4.3 | ⬜ OPEN |
+| `.gitignore` + pre-commit for `.env` | 4.3 | ⬜ OPEN |
+| Synthetic-only training/demo samples | 4.4 | 🟡 Policy + `data/samples/` path |
+| Observability / session tools PII hide config (when tools exist) | 4.5 | ⬜ OPEN |
+| UID generation rules (LEI + no applicant identity) | 4.6 | 🟡 Spec’d in DATA_PLANE_SPEC |
+| Documented local-only AI path (Ollama) | Local compute law | ⬜ OPEN (prove in runbook) |
+| Subprocessor list excludes public LLM training on bank data | G4 | ⬜ OPEN |
+| Agent instructions: refuse SAR/PII/secrets paste | Human+agent | ✅ This matrix |
 
 **G10 GREEN only when technical blockers are implemented or formally waived for synthetic-only phase with Commander sign-off.**
 
 ---
 
-## 5. Allowed patterns (safe)
+## 6. Allowed patterns (safe)
 
 | Pattern | Rule |
 |---------|------|
@@ -141,22 +207,24 @@ Public AI chatbots/search: **only** information that is **already public** or **
 | Public OCC/FFIEC text | Already public |
 | Redacted architecture diagrams | No secrets/URLs |
 | Local Ollama on **redacted** or synthetic text | On-box only |
+| Masked last-4 / tokens for internal tooling demos | Never full identifier |
 | Discussing control *names* (e.g. “we need MFA”) | No customer payloads |
 
 ---
 
-## 6. Examiner-facing language (cite pack)
+## 7. Examiner-facing language (cite pack)
 
 - *Prohibit the third party and its subcontractors from using or disclosing the bank’s information, except as necessary to provide the contracted activities or comply with legal requirements.*  
 - *AI assistants should access strictly controlled information; regulated use cases require authorized environments (e.g. FedRAMP-scoped patterns), not public consumer chatbots.*  
 - Aligns with OCC 2013-29 confidentiality and ongoing monitoring of fourth parties.
+- Regulatory UIDs must not embed direct applicant/borrower identifiers (1071 / reporting discipline).
 
 ---
 
-## 7. Scoreboard link
+## 8. Scoreboard link
 
 | Gate | This artifact | Status |
 |------|---------------|--------|
-| **G10** | This file | 🟡 **POLICY DRAFT** — technical blockers OPEN |
+| **G10** | This file | 🟡 **POLICY + PLAYBOOK** — technical blockers OPEN |
 
 When blockers land, update status → 🟢 GREEN and date the scoreboard in `PHASE-0_ACCEPTANCE_CHECKLIST.md`.

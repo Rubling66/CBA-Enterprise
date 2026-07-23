@@ -37,6 +37,10 @@ Ingestion expects strict schema adherence (CSV or pipe-delimited text, **UTF-8**
 
 **CBA mapping:** Map HMDA/1071-style fields onto `Disbursement` / obligation lines where applicable; maintain **codebook version** in lineage matrix (G1/G8).
 
+**UID privacy (G10 §4.6):** Regulatory unique identifiers **must not** embed name, SSN, account, or other direct applicant/borrower identifiers. LEI prefix + opaque sequence only. See `artifacts/DATA_CLASSIFICATION_AND_AI_GUARDRAILS_MATRIX.md`.
+
+**LLM egress:** Any field classed Restricted PII or Secrets must pass **tokenization/masking/redaction gateway** before model context — backend law, not UI-only.
+
 **Idempotency:** Prefer `uid` (or bank `idempotency_key`) as register-level unique key — see stress matrix.
 
 ---
