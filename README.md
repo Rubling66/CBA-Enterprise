@@ -41,13 +41,16 @@ CBA-Enterprise/
 
 ## Detroit Banks (Targets)
 
-| Bank | CBA Commitment | CRA Rating |
-|------|---------------|------------|
-| Huntington | ~$25B | Outstanding |
-| JPMorgan Chase | ~$32B | Outstanding |
-| Fifth Third | ~$12B | Outstanding |
-| Flagstar | ~$2B | Satisfactory |
-| Comerica | ~$5B | Satisfactory |
+| Bank | Hook (see market doc) | CRA / CBA note |
+|------|----------------------|----------------|
+| Huntington | $1B Detroit/Wayne carve-out + micro-lending | National Community Plan scale |
+| JPMorgan Chase | Flagship Detroit + EOCF/CDFI stack | Large holistic Detroit investment |
+| Fifth Third | G7 hyper-local neighborhood model | Exceeded national NCRC CBA goal |
+| Comerica | Hometown + Outstanding CRA PE | Historical Detroit Alliance CBA |
+| Flagstar | Regional | Prior target list |
+
+**Market gap:** Micro-loans **&lt;$100k** to LMI / majority-minority tracts under-indexed vs business share — product reports **micro band + tract**.  
+Detail: `docs/market/DETROIT_CBA_CRA_COMPETITIVE_LANDSCAPE.md`
 
 ## Regulatory Foundation
 

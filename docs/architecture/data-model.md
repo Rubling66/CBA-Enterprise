@@ -120,8 +120,21 @@ AuditEvent * (append-only, all tenants)
 | `community_development` | Community development | Facilities, CDFI, neighborhood projects |
 | `workforce` | Workforce | Training, apprenticeships, placement $ |
 
+### Size band (Detroit micro-gap — market intel)
+
+For `small_business` (and optionally all categories), track **amount band** for disparity reporting:
+
+| Band | Definition | Why |
+|------|------------|-----|
+| `micro` | &lt; $100,000 | LMI / majority-minority tract gap per Detroit lending research |
+| `standard` | ≥ $100,000 | Rest of commercial / larger credit |
+
+**Counterparty type** (required for CDFI routing narrative): `bank` | `cdfi` | `nonprofit` | `household` | `other`.
+
 **Invariant:** Every Disbursement.category ∈ taxonomy.  
 **Mapping table:** Bank source codes → taxonomy (versioned); remap creates AuditEvent; **cannot change category on disbursements already in a filed ReportPackage** without superseding report.
+
+**Market context:** `docs/market/DETROIT_CBA_CRA_COMPETITIVE_LANDSCAPE.md`
 
 ---
 
