@@ -57,14 +57,37 @@ CBA-Enterprise/
 - HMDA data standards
 - SOC 2 Type II (target certification)
 
+## Build vs runtime (critical)
+
+| Plane | Tooling | Data |
+|-------|---------|------|
+| **Build** | Grok Build, humans, CI | Synthetic / public / redacted only |
+| **Runtime** | Our engine (no public LLM) | Bank data under Phase-0 controls |
+
+See `docs/architecture/BUILD_PLANE_VS_RUNTIME_PLANE.md` and root **`AGENTS.md`**.
+
+## Framework docs (Phase-0)
+
+| Doc | Path |
+|-----|------|
+| Phase-0 gates G1–G10 | `docs/compliance/PHASE-0_ACCEPTANCE_CHECKLIST.md` |
+| Data plane + stress | `docs/compliance/DATA_PLANE_SPEC.md` |
+| OCC / vendor spine | `docs/regulatory/OCC-2013-29-vendor-management.md` |
+| System architecture | `docs/architecture/system-architecture.md` |
+| Data model | `docs/architecture/data-model.md` |
+| Dashboard IA | `docs/architecture/dashboard-wireframe.md` |
+| Evidence stubs | `docs/compliance/artifacts/` |
+
+**Phase-0 scoreboard is NOT GREEN until evidence is filled.** No feature BUILD-ORDER until then.
+
 ## Bridge Protocol
 
-Hermes (orchestrator) ↔ Grok (engineer) communication via `D-Obsidian/Bridge/`:
-- `to-grok/` — task briefs, framework requests, architecture decisions
-- `from-grok/` — status reports, build evidence, blockers
+Hermes (orchestrator) ↔ Grok (engineer) via `D-Obsidian/Bridge/`:
+- `to-grok/` — task briefs, framework requests, decisions
+- `from-grok/` — status, framework drafts, blockers
+- `PROTOCOL.md` — naming and priorities
 
 ## See Also
 
-- `dconsult/cba-reporting-system` — Full product specification (skill registry)
-- `dconsult/cba-enterprise` — CBA methodology & deployment framework
-- `dconsult/cba-enterprise-deployment` — Bank deployment playbook
+- Skill registry: `cba-reporting-system`, `cba-enterprise`, `cba-enterprise-deployment`
+- GitHub: https://github.com/Rubling66/CBA-Enterprise

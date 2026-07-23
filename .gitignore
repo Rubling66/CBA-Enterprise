@@ -19,10 +19,16 @@ dashboard/dist/
 .DS_Store
 Thumbs.db
 
-# Secrets
+# Secrets — never commit (G10)
 .env
+.env.*
+!.env.example
 *.pem
+*.key
 credentials/
+secrets/
+**/id_rsa
+**/*secret*
 
 # Data (sample data kept in data/samples/)
 data/*.csv
