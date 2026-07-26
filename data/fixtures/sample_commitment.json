@@ -1,0 +1,73 @@
+{
+  "institution_id": "FIXTURE-BANK-001",
+  "institution_name": "Example Community Bank (synthetic)",
+  "cba_id": "SYNTH-CBA-2024-001",
+  "consent_order_ref": "SYNTH-OCC-ORDER-NOT-REAL",
+  "effective_date": "2024-01-15",
+  "reporting_period": {
+    "start": "2026-01-01",
+    "end": "2026-06-30"
+  },
+  "commitments": [
+    {
+      "category": "small_business",
+      "description": "Micro-lending under $100k to LMI tracts",
+      "committed_usd": 5000000,
+      "disbursed_usd": 1250000,
+      "deadline": "2027-12-31",
+      "geography": "Wayne County MI"
+    },
+    {
+      "category": "housing",
+      "description": "Affordable housing development support",
+      "committed_usd": 10000000,
+      "disbursed_usd": 2400000,
+      "deadline": "2028-06-30",
+      "geography": "City of Detroit"
+    },
+    {
+      "category": "workforce",
+      "description": "Workforce development partnerships",
+      "committed_usd": 2000000,
+      "disbursed_usd": 400000,
+      "deadline": "2026-12-31",
+      "geography": "Detroit MSA"
+    }
+  ],
+  "disbursements": [
+    {
+      "id": "D-001",
+      "date": "2026-02-10",
+      "amount_usd": 75000,
+      "category": "small_business",
+      "recipient_type": "cdfi",
+      "tract_geoid": "26163512300",
+      "size_band": "micro",
+      "notes": "synthetic — no real recipient PII"
+    },
+    {
+      "id": "D-002",
+      "date": "2026-03-22",
+      "amount_usd": 150000,
+      "category": "housing",
+      "recipient_type": "nonprofit",
+      "tract_geoid": "26163545600",
+      "size_band": "small",
+      "notes": "synthetic"
+    },
+    {
+      "id": "D-003",
+      "date": "2026-05-01",
+      "amount_usd": 50000,
+      "category": "workforce",
+      "recipient_type": "workforce_agency",
+      "tract_geoid": null,
+      "size_band": "micro",
+      "notes": "synthetic"
+    }
+  ],
+  "_meta": {
+    "synthetic": true,
+    "note": "Fixture only — replace when bank data + BAA/vendor agreement in place"
+  }
+}
