@@ -89,7 +89,9 @@ We propose a **Free 90-Day Civic Execution Pilot** in 3 high-disparity Detroit n
 
 ### Founder Bio — Reuben Cole
 
-Reuben Cole is a Detroit native, 20-year union tradesman, and self-taught civic technologist. He holds a BFA in Corporate Visual Arts & Design from the University of Illinois at Urbana-Champaign (1997) and an IBM AI Fundamentals certification. After serving at Chanute Air Force Base (1995), Cole spent two decades on Detroit job sites — framing, finishing, and watching incentives fail to reach the workers who needed them most.
+Reuben Cole is a Detroit native, 20-year union tradesman, and self-taught civic technologist. He holds a BFA in Corporate Visual Arts & Design from the University of Illinois at Urbana-Champaign (1997) and an IBM AI Fundamentals certification. After serving at Chanute Air Force Base (1995), Cole worked as a foreman and architectural artist for the top architectural arts firm in Manhattan, managing back-to-back multi-million dollar jobs. He was later elected Union Steward — the representative charged with protecting workers' rights on the job site.
+
+The mission that drives dconsult traces to a single morning: his first walk to school, when the school bus passed him by. That moment seeded a lifelong understanding that systems designed to serve often skip the people who need them most. For 20 years on Detroit job sites — framing, finishing, leading crews, and serving as Steward — he watched incentives fail to reach the workers they were meant for.
 
 For 18 months, he built dconsult's entire product suite from a single laptop — coding, designing, and deploying Get Right Detroit, lots313, CBA Enterprise, and Fulcrum Financial without external funding or institutional datasets. The products were built on daily, direct interaction with Detroit tradespeople, residents, and business owners. Two weeks before this pitch, both the Mayor's 6,000-resident Disparity Report and the Gallup/Chamber 11,000-resident survey independently validated what Cole built from intuition and ground truth.
 
